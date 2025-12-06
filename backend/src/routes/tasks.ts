@@ -29,7 +29,7 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 router.post("/", validate(createTaskSchema), async (req: Request, res: Response) => {
-    const newTask = req.body as unknown as CreateTaskInput
+    const newTask = req.body as unknown as CreateTaskInput;
     const task = await createTask(newTask);
     return sendSuccess(res, task, StatusCodes.CREATED);
 });
@@ -51,18 +51,26 @@ router.get("/:id/available-assignees", async (req: Request, res: Response) => {
     return sendSuccess(res, { availableAssignees });
 });
 
-router.patch("/:id/status", validate(updateTaskStatusSchema), async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body as unknown as UpdateTaskStatusInput;
-    const task = await updateTaskStatus(id, status);
-    return sendSuccess(res, task);
-});
+router.patch(
+    "/:id/status",
+    validate(updateTaskStatusSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const { status } = req.body as unknown as UpdateTaskStatusInput;
+        const task = await updateTaskStatus(id, status);
+        return sendSuccess(res, task);
+    }
+);
 
-router.patch("/:id/assignee", validate(updateTaskAssigneeSchema), async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { assigneeId } = req.body as unknown as UpdateTaskAssigneeInput;
-    const task = await updateTaskAssignee(id, assigneeId);
-    return sendSuccess(res, task);
-});
+router.patch(
+    "/:id/assignee",
+    validate(updateTaskAssigneeSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const { assigneeId } = req.body as unknown as UpdateTaskAssigneeInput;
+        const task = await updateTaskAssignee(id, assigneeId);
+        return sendSuccess(res, task);
+    }
+);
 
 export default router;

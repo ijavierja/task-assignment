@@ -62,7 +62,6 @@ export const getAvailableAssignees = async (taskId: Task["id"]) => {
 };
 
 export const createTask = async (newTask: z.infer<typeof createTaskSchema>) => {
-
     if (newTask.skillIds.length > 0) {
         const skills = await prisma.skill.findMany({
             where: { id: { in: newTask.skillIds } },
@@ -105,7 +104,10 @@ export const updateTaskStatus = async (taskId: Task["id"], status: TaskStatus) =
     });
 };
 
-export const updateTaskAssignee = async (taskId: Task["id"], assigneeId: Developer["id"] | null) => {
+export const updateTaskAssignee = async (
+    taskId: Task["id"],
+    assigneeId: Developer["id"] | null
+) => {
     const task = await prisma.task.findUnique({
         where: { id: taskId },
         include: { skills: true },
