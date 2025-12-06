@@ -1,9 +1,8 @@
 import cors from "cors";
 import express, { Request, Response, NextFunction } from "express";
-import { z } from "zod";
-import developersRouter from "./routes/developers";
-import tasksRouter from "./routes/tasks";
-import skillsRouter from "./routes/skills";
+import { createHTTPHandler } from "@trpc/server/adapters/standalone";
+import { TRPCError } from "@trpc/server";
+import { appRouter } from "./trpc";
 import { sendError } from "./utils/response";
 import { StatusCodes } from "./utils/statusCodes";
 import { HttpError } from "./utils/errors";
@@ -24,10 +23,20 @@ app.get("/health", (_req, res) => {
     res.json({ status: "ok", message: "Server is running" });
 });
 
-// API Routes
-app.use("/api/developers", developersRouter);
-app.use("/api/tasks", tasksRouter);
-app.use("/api/skills", skillsRouter);
+// tRPC HTTP handler with error formatting
+const trpcHandler = createHTTPHandler({
+    router: appRouter,
+    onError: ({ error }) => {
+        if (error instanceof TRPCError) {
+            console.error(`[tRPC] ${error.code}: ${error.message}`);
+        } else {
+            console.error("[tRPC] Internal error:", error);
+        }
+    },
+});
+
+// Mount tRPC routes
+app.use("/trpc", trpcHandler);
 
 // 404 handler
 app.use((req, res) => {
@@ -37,15 +46,6 @@ app.use((req, res) => {
 // Error handler
 app.use((err: Error, _req: Request, res: Response, __next: NextFunction) => {
     console.error(err);
-
-    if (err instanceof z.ZodError) {
-        return sendError(
-            res,
-            err.issues[0]?.message ?? "Validation failed",
-            StatusCodes.BAD_REQUEST,
-            { validationErrors: err.issues }
-        );
-    }
 
     if (err instanceof HttpError) {
         return sendError(res, err.message, err.statusCode);
