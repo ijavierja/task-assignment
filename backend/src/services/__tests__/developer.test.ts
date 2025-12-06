@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
-jest.unstable_mockModule("../../lib/prisma.js", () => ({
+jest.unstable_mockModule("../../lib/prisma", () => ({
   prisma: {
     developer: {
       findMany: jest.fn(),
@@ -10,8 +10,8 @@ jest.unstable_mockModule("../../lib/prisma.js", () => ({
   },
 }));
 
-const { getAllDevelopers } = await import("../developer.js");
-const { prisma } = await import("../../lib/prisma.js");
+const { getAllDevelopers } = await import("../developer");
+const { prisma } = await import("../../lib/prisma");
 
 describe("Developer Service", () => {
   beforeEach(() => {

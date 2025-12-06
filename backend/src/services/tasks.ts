@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 
-export const getAllDevelopers = async () => {
-  return await prisma.developer.findMany({
+export const getAllTasks = async () => {
+  return await prisma.task.findMany({
     include: {
       skills: true,
     },
