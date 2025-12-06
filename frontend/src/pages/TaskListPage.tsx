@@ -12,12 +12,14 @@ import {
     Select,
     MenuItem,
     Button,
+    Snackbar,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { trpc } from '../utils/trpc';
 import { statusMapper, mapTaskFromAPI } from '../types';
 import { useTaskStore } from '../store/taskStore';
+import { useNotification } from '../hooks/useNotification';
 
 export default function TaskListPage() {
     const navigate = useNavigate();
@@ -25,6 +27,7 @@ export default function TaskListPage() {
     const [error, setError] = useState<Error | null>(null);
     
     const { tasks, setTasks, getAvailableAssignees, setAvailableAssignees, updateTaskAssignee, updateTaskStatus } = useTaskStore();
+    const { notification, showNotification, closeNotification } = useNotification();
     const queryClient = trpc.useUtils();
 
     // Fetch tasks on mount and store in Zustand
@@ -54,6 +57,10 @@ export default function TaskListPage() {
                 onSuccess: (updatedTask) => {
                     // Update the store with the new status from backend response
                     updateTaskStatus(taskId, updatedTask.status as any);
+                    showNotification('Task status updated successfully', 'success');
+                },
+                onError: () => {
+                    showNotification('Failed to update task status', 'error');
                 }
             }
         );
@@ -69,6 +76,13 @@ export default function TaskListPage() {
                 onSuccess: (updatedTask) => {
                     // Update the store with the new assignee from backend response
                     updateTaskAssignee(taskId, updatedTask.assignee as any || null);
+                    const message = updatedTask.assignee 
+                        ? `Task assigned to ${updatedTask.assignee.name}`
+                        : 'Task unassigned';
+                    showNotification(message, 'success');
+                },
+                onError: () => {
+                    showNotification('Failed to update task assignment', 'error');
                 }
             }
         );
@@ -106,7 +120,7 @@ export default function TaskListPage() {
     return (
         <Box>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1>Task List</h1>
+                <h1>Tasks</h1>
                 <Button 
                     variant="contained" 
                     color="primary"
@@ -180,6 +194,21 @@ export default function TaskListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Snackbar
+                open={!!notification}
+                autoHideDuration={3000}
+                onClose={closeNotification}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={closeNotification}
+                    severity={notification?.type || 'info'}
+                    sx={{ width: '100%' }}
+                >
+                    {notification?.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

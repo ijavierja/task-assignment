@@ -11,24 +11,31 @@ import {
     Chip,
     CircularProgress,
     Alert,
+    Snackbar,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { trpc } from '../utils/trpc';
+import { useNotification } from '../hooks/useNotification';
 
 export default function TaskCreationPage() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const { notification, showNotification, closeNotification } = useNotification();
 
     const { data: skills = [], isLoading: skillsLoading } = trpc.skills.getAll.useQuery();
     const createTaskMutation = trpc.tasks.create.useMutation({
         onSuccess: () => {
-            navigate('/');
+            showNotification('Task created successfully!', 'success');
+            setTimeout(() => {
+                navigate('/');
+            }, 1000);
         },
         onError: (err) => {
             setError(err.message);
+            showNotification('Failed to create task', 'error');
         },
     });
 
@@ -128,6 +135,21 @@ export default function TaskCreationPage() {
                     </Box>
                 </form>
             </Paper>
+
+            <Snackbar
+                open={!!notification}
+                autoHideDuration={3000}
+                onClose={closeNotification}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={closeNotification}
+                    severity={notification?.type || 'info'}
+                    sx={{ width: '100%' }}
+                >
+                    {notification?.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }
