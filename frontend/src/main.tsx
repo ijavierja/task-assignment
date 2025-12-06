@@ -1,13 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import axios from 'axios';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import './index.css';
 import App from './App';
+import { trpc, trpcClient } from './utils/trpc';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <App />
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+                <App />
+            </QueryClientProvider>
+        </trpc.Provider>
     </React.StrictMode>
 );

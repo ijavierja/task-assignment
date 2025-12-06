@@ -9,16 +9,28 @@ import {
     MenuItem,
     OutlinedInput,
     Chip,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const mockSkills = ['React', 'TypeScript', 'PostgreSQL', 'Node.js', 'Documentation', 'UI/UX'];
+import { trpc } from '../utils/trpc';
 
 export default function TaskCreationPage() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+    const [error, setError] = useState<string | null>(null);
+
+    const { data: skills = [], isLoading: skillsLoading } = trpc.skills.getAll.useQuery();
+    const createTaskMutation = trpc.tasks.create.useMutation({
+        onSuccess: () => {
+            navigate('/');
+        },
+        onError: (err) => {
+            setError(err.message);
+        },
+    });
 
     const handleSkillsChange = (event: any) => {
         setSelectedSkills(event.target.value);
@@ -27,17 +39,27 @@ export default function TaskCreationPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) {
-            alert('Please enter a task title');
+            setError('Please enter a task title');
             return;
         }
         if (selectedSkills.length === 0) {
-            alert('Please select at least one skill');
+            setError('Please select at least one skill');
             return;
         }
-        console.log('Creating task:', { title, skills: selectedSkills });
-        alert('Task created! (mock)');
-        navigate('/');
+        setError(null);
+        createTaskMutation.mutate({
+            title,
+            skillIds: selectedSkills,
+        });
     };
+
+    if (skillsLoading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <Box>
@@ -46,6 +68,11 @@ export default function TaskCreationPage() {
             </Box>
 
             <Paper sx={{ p: 4, maxWidth: 600 }}>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
                 <form onSubmit={handleSubmit}>
                     <Box sx={{ mb: 3 }}>
                         <TextField
@@ -70,15 +97,16 @@ export default function TaskCreationPage() {
                                 input={<OutlinedInput label="Required Skills" />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => (
-                                            <Chip key={value} label={value} />
-                                        ))}
+                                        {selected.map((skillId) => {
+                                            const skill = skills.find((s: any) => s.id === skillId);
+                                            return <Chip key={skillId} label={skill?.name || skillId} />;
+                                        })}
                                     </Box>
                                 )}
                             >
-                                {mockSkills.map((skill) => (
-                                    <MenuItem key={skill} value={skill}>
-                                        {skill}
+                                {skills.map((skill: any) => (
+                                    <MenuItem key={skill.id} value={skill.id}>
+                                        {skill.name}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -86,8 +114,13 @@ export default function TaskCreationPage() {
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button type="submit" variant="contained" color="primary">
-                            Create Task
+                        <Button 
+                            type="submit" 
+                            variant="contained" 
+                            color="primary"
+                            disabled={createTaskMutation.isPending}
+                        >
+                            {createTaskMutation.isPending ? 'Creating...' : 'Create Task'}
                         </Button>
                         <Button variant="outlined" onClick={() => navigate('/')}>
                             Cancel

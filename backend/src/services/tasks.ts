@@ -45,15 +45,15 @@ export const getAvailableAssignees = async (taskId: Task["id"]): Promise<Develop
     }
 
     const requiredSkillIds = task.skills.map((s) => s.id);
+    
+    // Get developers that have ALL required skills
     return await prisma.developer.findMany({
         where: {
-            skills: {
-                every: {
-                    id: {
-                        in: requiredSkillIds,
-                    },
+            AND: requiredSkillIds.map((skillId) => ({
+                skills: {
+                    some: { id: skillId },
                 },
-            },
+            })),
         },
         orderBy: { name: "asc" },
     });

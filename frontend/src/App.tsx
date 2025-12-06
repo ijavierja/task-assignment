@@ -6,10 +6,7 @@ import router from './Router';
 const theme = createTheme({
     palette: {
         primary: {
-            main: 'rgb(254, 71, 148)',
-        },
-        secondary: {
-            main: '#dc004e',
+            main: '#5c068c',
         },
     },
 });
