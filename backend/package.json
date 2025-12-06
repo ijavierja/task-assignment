@@ -11,7 +11,9 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +29,7 @@
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "jest": "^30.2.0",
+    "prettier": "^3.7.4",
     "prisma": "^7.0.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",

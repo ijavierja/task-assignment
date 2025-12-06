@@ -1,6 +1,11 @@
 import { Response } from "express";
 
-export function sendSuccess<T>(res: Response, data: T, statusCode: number = 200, meta?: Record<string, unknown>) {
+export function sendSuccess<T>(
+    res: Response,
+    data: T,
+    statusCode: number = 200,
+    meta?: Record<string, unknown>
+) {
     const response: Record<string, unknown> = { data };
     if (meta) response.meta = meta;
     res.status(statusCode).json(response);
@@ -16,6 +21,6 @@ export function sendError(
         error: {
             message,
             details: details || undefined,
-        }
+        },
     });
 }

@@ -35,12 +35,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((
-    err: Error,
-    _req: Request,
-    res: Response,
-    __next: NextFunction
-) => {
+app.use((err: Error, _req: Request, res: Response, __next: NextFunction) => {
     console.error(err);
 
     if (err instanceof z.ZodError) {
