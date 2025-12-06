@@ -1,15 +1,12 @@
 import { prisma } from "../lib/prisma";
-import type { Task, TaskStatus, Developer } from "../../generated/prisma";
-import {
-    createTaskSchema,
-    updateTaskSchema,
-    type CreateTaskInput,
-    type UpdateTaskInput,
-} from "../schemas/taskSchema";
+import type { Task, TaskStatus, Developer, Skill } from "../../generated/prisma";
+import { createTaskSchema } from "../schemas/taskSchema";
 import { BadRequestError, NotFoundError } from "../utils/errors";
 import z from "zod";
 
-export const getAllTasks = async () => {
+export const getAllTasks = async (): Promise<
+    Array<Task & { skills: Skill[]; assignee: Developer | null }>
+> => {
     return await prisma.task.findMany({
         include: {
             skills: true,
@@ -19,7 +16,9 @@ export const getAllTasks = async () => {
     });
 };
 
-export const getTask = async (taskId: Task["id"]) => {
+export const getTask = async (
+    taskId: Task["id"]
+): Promise<(Task & { skills: Skill[]; assignee: Developer | null }) | null> => {
     return await prisma.task.findUnique({
         where: { id: taskId },
         include: {
@@ -29,7 +28,7 @@ export const getTask = async (taskId: Task["id"]) => {
     });
 };
 
-export const getAvailableAssignees = async (taskId: Task["id"]) => {
+export const getAvailableAssignees = async (taskId: Task["id"]): Promise<Developer[]> => {
     const task = await prisma.task.findUnique({
         where: { id: taskId },
         include: { skills: true },
@@ -38,7 +37,6 @@ export const getAvailableAssignees = async (taskId: Task["id"]) => {
     if (!task) {
         throw new NotFoundError("Task not found");
     }
-    let res: Developer;
 
     if (task.skills.length === 0) {
         return await prisma.developer.findMany({
@@ -61,7 +59,9 @@ export const getAvailableAssignees = async (taskId: Task["id"]) => {
     });
 };
 
-export const createTask = async (newTask: z.infer<typeof createTaskSchema>) => {
+export const createTask = async (
+    newTask: z.infer<typeof createTaskSchema>
+): Promise<Task & { skills: Skill[]; assignee: Developer | null }> => {
     if (newTask.skillIds.length > 0) {
         const skills = await prisma.skill.findMany({
             where: { id: { in: newTask.skillIds } },
@@ -85,7 +85,10 @@ export const createTask = async (newTask: z.infer<typeof createTaskSchema>) => {
     });
 };
 
-export const updateTaskStatus = async (taskId: Task["id"], status: TaskStatus) => {
+export const updateTaskStatus = async (
+    taskId: Task["id"],
+    status: TaskStatus
+): Promise<Task & { skills: Skill[]; assignee: Developer | null }> => {
     const task = await prisma.task.findUnique({
         where: { id: taskId },
     });
@@ -107,7 +110,7 @@ export const updateTaskStatus = async (taskId: Task["id"], status: TaskStatus) =
 export const updateTaskAssignee = async (
     taskId: Task["id"],
     assigneeId: Developer["id"] | null
-) => {
+): Promise<Task & { skills: Skill[]; assignee: Developer | null }> => {
     const task = await prisma.task.findUnique({
         where: { id: taskId },
         include: { skills: true },

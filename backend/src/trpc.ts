@@ -1,14 +1,14 @@
-import { initTRPC, TRPCError } from '@trpc/server';
-import * as taskService from './services/tasks';
-import * as developerService from './services/developer';
-import * as skillsService from './services/skills';
-import { HttpError } from './utils/errors';
-import { z } from 'zod';
+import { initTRPC, TRPCError } from "@trpc/server";
+import * as taskService from "./services/tasks";
+import * as developerService from "./services/developer";
+import * as skillsService from "./services/skills";
+import { HttpError } from "./utils/errors";
+import { z } from "zod";
 import {
     createTaskSchema,
     updateTaskStatusSchema,
     updateTaskAssigneeSchema,
-} from './schemas/taskSchema';
+} from "./schemas/taskSchema";
 
 // Initialize tRPC (no context needed yet)
 const t = initTRPC.create();
@@ -31,11 +31,10 @@ const httpToTrpcCodeMap: Record<number, TRPCError["code"]> = {
 const errorHandlingMiddleware = t.middleware(async ({ next }) => {
     try {
         return await next();
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Handle custom HTTP errors
         if (error instanceof HttpError) {
-            const code =
-                httpToTrpcCodeMap[error.statusCode] ?? "INTERNAL_SERVER_ERROR";
+            const code = httpToTrpcCodeMap[error.statusCode] ?? "INTERNAL_SERVER_ERROR";
 
             throw new TRPCError({
                 code,
@@ -64,34 +63,24 @@ export const appRouter = router({
             return await taskService.getAllTasks();
         }),
 
-        getById: publicProcedure
-            .input(z.object({ id: z.string() }))
-            .query(async ({ input }) => {
-                return await taskService.getTask(input.id);
-            }),
+        getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+            return await taskService.getTask(input.id);
+        }),
 
-        create: publicProcedure
-            .input(createTaskSchema)
-            .mutation(async ({ input }) => {
-                return await taskService.createTask(input);
-            }),
+        create: publicProcedure.input(createTaskSchema).mutation(async ({ input }) => {
+            return await taskService.createTask(input);
+        }),
 
         updateStatus: publicProcedure
             .input(z.object({ id: z.string() }).merge(updateTaskStatusSchema))
             .mutation(async ({ input }) => {
-                return await taskService.updateTaskStatus(
-                    input.id,
-                    input.status
-                );
+                return await taskService.updateTaskStatus(input.id, input.status);
             }),
 
         assignDeveloper: publicProcedure
             .input(z.object({ id: z.string() }).merge(updateTaskAssigneeSchema))
             .mutation(async ({ input }) => {
-                return await taskService.updateTaskAssignee(
-                    input.id,
-                    input.assigneeId
-                );
+                return await taskService.updateTaskAssignee(input.id, input.assigneeId);
             }),
 
         getAvailableAssignees: publicProcedure
@@ -107,11 +96,9 @@ export const appRouter = router({
             return await developerService.getAllDevelopers();
         }),
 
-        getById: publicProcedure
-            .input(z.object({ id: z.string() }))
-            .query(async ({ input }) => {
-                return await developerService.getDeveloper(input.id);
-            }),
+        getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+            return await developerService.getDeveloper(input.id);
+        }),
     }),
 
     // Skills procedures
@@ -120,11 +107,9 @@ export const appRouter = router({
             return await skillsService.getAllSkills();
         }),
 
-        getById: publicProcedure
-            .input(z.object({ id: z.string() }))
-            .query(async ({ input }) => {
-                return await skillsService.getSkill(input.id);
-            }),
+        getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+            return await skillsService.getSkill(input.id);
+        }),
     }),
 });
 

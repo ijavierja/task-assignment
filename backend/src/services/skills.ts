@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma";
 import type { Skill } from "../../generated/prisma";
 import { NotFoundError } from "../utils/errors";
 
-export const getAllSkills = async () => {
+export const getAllSkills = async (): Promise<Skill[]> => {
     return await prisma.skill.findMany({
         orderBy: {
             name: "asc",
@@ -10,7 +10,7 @@ export const getAllSkills = async () => {
     });
 };
 
-export const getSkill = async (skillId: Skill["id"]) => {
+export const getSkill = async (skillId: Skill["id"]): Promise<Skill> => {
     const skill = await prisma.skill.findUnique({
         where: { id: skillId },
     });
