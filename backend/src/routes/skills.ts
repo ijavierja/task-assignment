@@ -1,18 +1,18 @@
 import { Router, Request, Response } from "express";
-import { getAllDevelopers, getDeveloper } from "../services/developer";
+import { getAllSkills, getSkill } from "src/services/skills";
 import { sendSuccess } from "src/utils/response";
 
 const router = Router();
 
 router.get("/", async (_req: Request, res: Response) => {
-  const developers = await getAllDevelopers();
-  return sendSuccess(res, { developers });
+  const skills = await getAllSkills();
+  return sendSuccess(res, { skills });
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
-  const developer = await getDeveloper(id);
-  return sendSuccess(res, developer);
+  const skill = await getSkill(id);
+  return sendSuccess(res, skill);
 });
 
 export default router;

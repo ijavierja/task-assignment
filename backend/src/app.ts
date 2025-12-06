@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import developersRouter from "./routes/developers";
 import tasksRouter from "./routes/tasks";
+import skillsRouter from "./routes/skills";
 import { sendError } from "./utils/response";
 import { StatusCodes } from "./utils/statusCodes";
 import { HttpError } from "./utils/errors";
@@ -26,6 +27,7 @@ app.get("/health", (_req, res) => {
 // API Routes
 app.use("/api/developers", developersRouter);
 app.use("/api/tasks", tasksRouter);
+app.use("/api/skills", skillsRouter);
 
 // 404 handler
 app.use((req, res) => {
