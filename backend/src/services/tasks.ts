@@ -7,6 +7,7 @@ import {
     type UpdateTaskInput,
 } from "../schemas/taskSchema";
 import { BadRequestError, NotFoundError } from "../utils/errors";
+import z from "zod";
 
 export const getAllTasks = async () => {
     return await prisma.task.findMany({
@@ -60,23 +61,22 @@ export const getAvailableAssignees = async (taskId: Task["id"]) => {
     });
 };
 
-export const createTask = async (input) => {
-    const validatedInput = createTaskSchema.parse(input);
+export const createTask = async (newTask: z.infer<typeof createTaskSchema>) => {
 
-    if (validatedInput.skillIds.length > 0) {
+    if (newTask.skillIds.length > 0) {
         const skills = await prisma.skill.findMany({
-            where: { id: { in: validatedInput.skillIds } },
+            where: { id: { in: newTask.skillIds } },
         });
-        if (skills.length !== validatedInput.skillIds.length) {
+        if (skills.length !== newTask.skillIds.length) {
             throw new BadRequestError("One or more skills not found");
         }
     }
 
     return await prisma.task.create({
         data: {
-            title: validatedInput.title,
+            title: newTask.title,
             skills: {
-                connect: validatedInput.skillIds.map((id) => ({ id })),
+                connect: newTask.skillIds.map((id) => ({ id })),
             },
         },
         include: {
@@ -105,7 +105,7 @@ export const updateTaskStatus = async (taskId: Task["id"], status: TaskStatus) =
     });
 };
 
-export const updateTaskAssignee = async (taskId: Task["id"], assigneeId: string | null) => {
+export const updateTaskAssignee = async (taskId: Task["id"], assigneeId: Developer["id"] | null) => {
     const task = await prisma.task.findUnique({
         where: { id: taskId },
         include: { skills: true },
