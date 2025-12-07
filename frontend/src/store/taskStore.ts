@@ -22,15 +22,11 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     getTask: (id: string) => get().tasks.find((task) => task.id === id),
     updateTaskAssignee: (taskId: string, assignee: Developer | null) =>
         set((state) => ({
-            tasks: state.tasks.map((task) =>
-                task.id === taskId ? { ...task, assignee } : task
-            ),
+            tasks: state.tasks.map((task) => (task.id === taskId ? { ...task, assignee } : task)),
         })),
     updateTaskStatus: (taskId: string, status: TaskStatus) =>
         set((state) => ({
-            tasks: state.tasks.map((task) =>
-                task.id === taskId ? { ...task, status } : task
-            ),
+            tasks: state.tasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
         })),
 
     // Available assignees

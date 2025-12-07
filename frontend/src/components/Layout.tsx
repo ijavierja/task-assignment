@@ -7,13 +7,15 @@ export default function Layout() {
             <AppBar position="static">
                 <Toolbar>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
-                        <img 
-                            src="/htx_vertical_logo_reverse.png" 
-                            alt="logo" 
+                        <img
+                            src="/htx_vertical_logo_reverse.png"
+                            alt="logo"
                             style={{ height: 40, width: 'auto' }}
                         />
                         <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
-                            <Box sx={{ fontSize: 24, fontWeight: 'bold', marginLeft: '16px' }}>Task Assignment</Box>
+                            <Box sx={{ fontSize: 24, fontWeight: 'bold', marginLeft: '16px' }}>
+                                Task Assignment
+                            </Box>
                         </Link>
                     </Box>
                     <Button color="inherit" component={Link} to="/">

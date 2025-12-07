@@ -9,7 +9,7 @@ export interface TaskFormData {
 
 interface TaskCreationState {
     mainTask: TaskFormData;
-    
+
     // Actions
     initializeTask: () => void;
     updateTaskField: (id: string, field: 'title' | 'skillIds', value: string | string[]) => void;
@@ -28,12 +28,10 @@ const updateTaskInTree = (
     if (task.id === targetId) {
         return updater(task);
     }
-    
+
     return {
         ...task,
-        subtasks: task.subtasks.map(subtask =>
-            updateTaskInTree(subtask, targetId, updater)
-        ),
+        subtasks: task.subtasks.map((subtask) => updateTaskInTree(subtask, targetId, updater)),
     };
 };
 
@@ -42,12 +40,12 @@ const findTaskInTree = (task: TaskFormData, id: string): TaskFormData | null => 
     if (task.id === id) {
         return task;
     }
-    
+
     for (const subtask of task.subtasks) {
         const found = findTaskInTree(subtask, id);
         if (found) return found;
     }
-    
+
     return null;
 };
 

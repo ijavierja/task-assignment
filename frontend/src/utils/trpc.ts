@@ -9,12 +9,12 @@ export const trpc = createTRPCReact<AppRouter>();
 // In production/Docker (port 80): use relative path (proxied by nginx)
 const getApiUrl = () => {
     if (typeof window === 'undefined') return '/trpc';
-    
+
     // Development mode: frontend running on port 3000
     if (window.location.port === '3000') {
         return 'http://localhost:3001/trpc';
     }
-    
+
     // Production/Docker mode: use relative path (nginx proxies to backend)
     return '/trpc';
 };

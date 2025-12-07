@@ -60,8 +60,8 @@ export default function TaskRow({
     // Check if all subtasks are done
     const hasIncompletedSubtasks = (task: TaskWithSubtasks): boolean => {
         if (!task.subtasks || task.subtasks.length === 0) return false;
-        
-        return task.subtasks.some(subtask => {
+
+        return task.subtasks.some((subtask) => {
             if (subtask.status !== 'DONE') return true;
             return hasIncompletedSubtasks(subtask);
         });
@@ -74,10 +74,10 @@ export default function TaskRow({
         if (level === 0) return 'inherit';
         // Create progressively darker backgrounds for each level
         const colors = [
-            'rgba(0, 0, 0, 0.02)',  // level 1 - very light
-            'rgba(0, 0, 0, 0.06)',  // level 2 - slightly darker
-            'rgba(0, 0, 0, 0.10)',  // level 3 - more visible
-            'rgba(0, 0, 0, 0.14)',  // level 4+ - darkest
+            'rgba(0, 0, 0, 0.02)', // level 1 - very light
+            'rgba(0, 0, 0, 0.06)', // level 2 - slightly darker
+            'rgba(0, 0, 0, 0.10)', // level 3 - more visible
+            'rgba(0, 0, 0, 0.14)', // level 4+ - darkest
         ];
         return colors[Math.min(level - 1, colors.length - 1)];
     };
@@ -87,10 +87,7 @@ export default function TaskRow({
             <TableCell sx={{ pl: level * 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {hasSubtasks && (
-                        <IconButton
-                            size="small"
-                            onClick={() => onToggleExpand(task.id)}
-                        >
+                        <IconButton size="small" onClick={() => onToggleExpand(task.id)}>
                             {isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>
                     )}
@@ -146,8 +143,14 @@ export default function TaskRow({
                 </Select>
             </TableCell>
             <TableCell>
-                <Tooltip 
-                    title={!canAddSubtask ? (task.status === 'DONE' ? 'Cannot add subtasks to completed tasks' : 'Maximum depth level (4) reached') : ''}
+                <Tooltip
+                    title={
+                        !canAddSubtask
+                            ? task.status === 'DONE'
+                                ? 'Cannot add subtasks to completed tasks'
+                                : 'Maximum depth level (4) reached'
+                            : ''
+                    }
                     disableFocusListener={canAddSubtask}
                     disableHoverListener={canAddSubtask}
                     disableTouchListener={canAddSubtask}

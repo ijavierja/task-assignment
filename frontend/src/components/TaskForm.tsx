@@ -37,7 +37,7 @@ export default function TaskForm({
     parentTaskId = task.id,
 }: TaskFormProps) {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-    
+
     // Get store actions
     const updateTaskField = useTaskCreationStore((state) => state.updateTaskField);
     const addSubtask = useTaskCreationStore((state) => state.addSubtask);
@@ -71,11 +71,11 @@ export default function TaskForm({
                             fullWidth
                             size={isRoot ? 'medium' : 'small'}
                             label={isRoot ? 'Task Title' : 'Subtask Title'}
-                            placeholder={isRoot ? 'e.g., Build login form' : 'e.g., Implement feature'}
-                            value={task.title}
-                            onChange={(e) =>
-                                updateTaskField(task.id, 'title', e.target.value)
+                            placeholder={
+                                isRoot ? 'e.g., Build login form' : 'e.g., Implement feature'
                             }
+                            value={task.title}
+                            onChange={(e) => updateTaskField(task.id, 'title', e.target.value)}
                             variant="outlined"
                         />
                         {!isRoot && (
@@ -91,9 +91,7 @@ export default function TaskForm({
 
                     <Box sx={{ mb: 2 }}>
                         <FormControl fullWidth size={isRoot ? 'medium' : 'small'}>
-                            <InputLabel id={`skills-label-${task.id}`}>
-                                Required Skills
-                            </InputLabel>
+                            <InputLabel id={`skills-label-${task.id}`}>Required Skills</InputLabel>
                             <Select
                                 labelId={`skills-label-${task.id}`}
                                 id={`skills-${task.id}`}
@@ -106,9 +104,7 @@ export default function TaskForm({
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((skillId) => {
-                                            const skill = skills.find(
-                                                (s: any) => s.id === skillId
-                                            );
+                                            const skill = skills.find((s: any) => s.id === skillId);
                                             return (
                                                 <Chip
                                                     key={skillId}
@@ -127,7 +123,8 @@ export default function TaskForm({
                                 ))}
                             </Select>
                             <FormHelperText>
-                                Optional: Leave empty and skills will be automatically identified by AI
+                                Optional: Leave empty and skills will be automatically identified by
+                                AI
                             </FormHelperText>
                         </FormControl>
                     </Box>
@@ -154,7 +151,9 @@ export default function TaskForm({
                             </Box>
 
                             <Collapse in={expandedIds.has(task.id)} timeout="auto">
-                                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <Box
+                                    sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}
+                                >
                                     {task.subtasks.map((subtask) => (
                                         <TaskForm
                                             key={subtask.id}

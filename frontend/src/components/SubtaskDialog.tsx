@@ -98,7 +98,10 @@ export default function SubtaskDialog({
                         disabled={createSubtaskMutation.isPending}
                     />
 
-                    <FormControl fullWidth disabled={skillsLoading || createSubtaskMutation.isPending}>
+                    <FormControl
+                        fullWidth
+                        disabled={skillsLoading || createSubtaskMutation.isPending}
+                    >
                         <InputLabel id="skills-label">Required Skills</InputLabel>
                         <Select
                             labelId="skills-label"
@@ -111,7 +114,9 @@ export default function SubtaskDialog({
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((skillId) => {
                                         const skill = skills.find((s: any) => s.id === skillId);
-                                        return <Chip key={skillId} label={skill?.name || skillId} />;
+                                        return (
+                                            <Chip key={skillId} label={skill?.name || skillId} />
+                                        );
                                     })}
                                 </Box>
                             )}

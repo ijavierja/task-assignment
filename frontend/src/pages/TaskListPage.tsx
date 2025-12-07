@@ -44,8 +44,14 @@ export default function TaskListPage() {
     }>({ open: false, parentTaskId: '', parentTaskTitle: '' });
     const [tasksWithSubtasks, setTasksWithSubtasks] = useState<TaskWithSubtasks[]>([]);
     const [taskMap, setTaskMap] = useState<Map<string, TaskWithSubtasks>>(new Map());
-    
-    const { setTasks, getAvailableAssignees, setAvailableAssignees, updateTaskAssignee, updateTaskStatus } = useTaskStore();
+
+    const {
+        setTasks,
+        getAvailableAssignees,
+        setAvailableAssignees,
+        updateTaskAssignee,
+        updateTaskStatus,
+    } = useTaskStore();
     const { notification, showNotification, closeNotification } = useNotification();
     const queryClient = trpc.useUtils();
 
@@ -95,7 +101,7 @@ export default function TaskListPage() {
 
         fetchTasks();
     }, [setTasks, queryClient]);
-    
+
     const updateStatusMutation = trpc.tasks.updateStatus.useMutation();
     const assignDeveloperMutation = trpc.tasks.assignDeveloper.useMutation();
 
@@ -105,9 +111,9 @@ export default function TaskListPage() {
             {
                 onSuccess: (updatedTask) => {
                     updateTaskStatus(taskId, updatedTask.status as any);
-                    
+
                     // Update local state immediately
-                    setTasksWithSubtasks((prevTasks) => 
+                    setTasksWithSubtasks((prevTasks) =>
                         updateTaskInHierarchy(prevTasks, taskId, { status: newStatus })
                     );
 
@@ -120,41 +126,43 @@ export default function TaskListPage() {
                         }
                         return newMap;
                     });
-                    
+
                     showNotification('Task status updated successfully', 'success');
                     // Refresh to update hierarchy
                     queryClient.tasks.getAll.invalidate();
                 },
                 onError: (err) => {
                     showNotification(err.message || 'Failed to update task status', 'error');
-                }
+                },
             }
         );
     };
 
     const handleAssigneeChange = (taskId: string, newAssigneeId: string) => {
         assignDeveloperMutation.mutate(
-            { 
-                id: taskId, 
-                assigneeId: newAssigneeId || null 
+            {
+                id: taskId,
+                assigneeId: newAssigneeId || null,
             },
             {
                 onSuccess: (updatedTask) => {
-                    updateTaskAssignee(taskId, updatedTask.assignee as any || null);
-                    
+                    updateTaskAssignee(taskId, (updatedTask.assignee as any) || null);
+
                     // Update local state immediately
-                    setTasksWithSubtasks((prevTasks) => 
-                        updateTaskInHierarchy(prevTasks, taskId, { assignee: updatedTask.assignee || undefined })
+                    setTasksWithSubtasks((prevTasks) =>
+                        updateTaskInHierarchy(prevTasks, taskId, {
+                            assignee: updatedTask.assignee || undefined,
+                        })
                     );
-                    
-                    const message = updatedTask.assignee 
+
+                    const message = updatedTask.assignee
                         ? `Task assigned to ${updatedTask.assignee.name}`
                         : 'Task unassigned';
                     showNotification(message, 'success');
                 },
                 onError: () => {
                     showNotification('Failed to update task assignment', 'error');
-                }
+                },
             }
         );
     };
@@ -162,9 +170,11 @@ export default function TaskListPage() {
     const handleDropdownOpen = (taskId: string) => {
         const cached = getAvailableAssignees(taskId);
         if (!cached) {
-            queryClient.tasks.getAvailableAssignees.fetch({ id: taskId }).then((availableAssignees: any) => {
-                setAvailableAssignees(taskId, availableAssignees);
-            });
+            queryClient.tasks.getAvailableAssignees
+                .fetch({ id: taskId })
+                .then((availableAssignees: any) => {
+                    setAvailableAssignees(taskId, availableAssignees);
+                });
         }
     };
 
@@ -244,7 +254,7 @@ export default function TaskListPage() {
             };
 
             // Update hierarchy with new subtask
-            setTasksWithSubtasks((prevTasks) => 
+            setTasksWithSubtasks((prevTasks) =>
                 addSubtaskToHierarchy(prevTasks, subtaskDialog.parentTaskId, newTaskWithSubtasks)
             );
 
@@ -274,7 +284,11 @@ export default function TaskListPage() {
         return hasAncestorDone(parentTask.id, taskMap);
     };
 
-    const renderTaskRow = (task: TaskWithSubtasks, level: number = 0, taskMap?: Map<string, TaskWithSubtasks>) => {
+    const renderTaskRow = (
+        task: TaskWithSubtasks,
+        level: number = 0,
+        taskMap?: Map<string, TaskWithSubtasks>
+    ) => {
         const isExpanded = expandedRows.has(task.id);
         const hasAnyAncestorDone = taskMap ? hasAncestorDone(task.id, taskMap) : false;
 
@@ -294,7 +308,7 @@ export default function TaskListPage() {
                 getAvailableAssignees={getAvailableAssignees}
             />,
             // Subtasks rows
-            ...((task.subtasks && task.subtasks.length > 0 && isExpanded)
+            ...(task.subtasks && task.subtasks.length > 0 && isExpanded
                 ? task.subtasks.flatMap((subtask) => renderTaskRow(subtask, level + 1, taskMap))
                 : []),
         ];
@@ -311,19 +325,24 @@ export default function TaskListPage() {
     if (error) {
         return (
             <Box sx={{ p: 2 }}>
-                <Alert severity="error">
-                    Error loading tasks: {error.message}
-                </Alert>
+                <Alert severity="error">Error loading tasks: {error.message}</Alert>
             </Box>
         );
     }
 
     return (
         <Box>
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+                sx={{
+                    mb: 3,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
                 <h1>Tasks</h1>
-                <Button 
-                    variant="contained" 
+                <Button
+                    variant="contained"
                     color="primary"
                     onClick={() => navigate('/create-task')}
                 >
@@ -351,7 +370,9 @@ export default function TaskListPage() {
             {/* Subtask Dialog */}
             <SubtaskDialog
                 open={subtaskDialog.open}
-                onClose={() => setSubtaskDialog({ open: false, parentTaskId: '', parentTaskTitle: '' })}
+                onClose={() =>
+                    setSubtaskDialog({ open: false, parentTaskId: '', parentTaskTitle: '' })
+                }
                 parentTaskId={subtaskDialog.parentTaskId}
                 parentTaskTitle={subtaskDialog.parentTaskTitle}
                 onSubtaskCreated={handleSubtaskCreated}

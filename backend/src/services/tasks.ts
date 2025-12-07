@@ -24,7 +24,7 @@ const calculateTaskDepth = async (taskId: string): Promise<number> => {
         )
         SELECT MAX(depth) as depth FROM task_hierarchy;
     `;
-    
+
     return result[0]?.depth ?? 0;
 };
 
@@ -69,7 +69,7 @@ export const getAvailableAssignees = async (taskId: Task["id"]): Promise<Develop
     }
 
     const requiredSkillIds = task.skills.map((s) => s.id);
-    
+
     // Get developers that have ALL required skills
     return await prisma.developer.findMany({
         where: {
@@ -115,7 +115,7 @@ export const createTask = async (
     let skillIds = newTask.skillIds;
     if (skillIds.length === 0) {
         const identifiedSkillNames = await identifySkillsFromTask(newTask.title);
-        
+
         if (identifiedSkillNames.length > 0) {
             skillIds = await getSkillIdsByNames(identifiedSkillNames);
         }

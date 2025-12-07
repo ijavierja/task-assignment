@@ -68,19 +68,12 @@ export default function SubtaskForm({
     };
 
     const updateSubtask = (id: string, updates: Partial<SubtaskFormData>) => {
-        const updated = subtasks.map((s) =>
-            s.id === id ? { ...s, ...updates } : s
-        );
+        const updated = subtasks.map((s) => (s.id === id ? { ...s, ...updates } : s));
         onSubtasksChange(updated);
     };
 
-    const updateSubtaskNested = (
-        id: string,
-        nestedSubtasks: SubtaskFormData[]
-    ) => {
-        const updated = subtasks.map((s) =>
-            s.id === id ? { ...s, subtasks: nestedSubtasks } : s
-        );
+    const updateSubtaskNested = (id: string, nestedSubtasks: SubtaskFormData[]) => {
+        const updated = subtasks.map((s) => (s.id === id ? { ...s, subtasks: nestedSubtasks } : s));
         onSubtasksChange(updated);
     };
 
@@ -138,7 +131,9 @@ export default function SubtaskForm({
                                         }
                                         input={<OutlinedInput label="Required Skills" />}
                                         renderValue={(selected) => (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            <Box
+                                                sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                                            >
                                                 {selected.map((skillId) => {
                                                     const skill = skills.find(
                                                         (s: any) => s.id === skillId

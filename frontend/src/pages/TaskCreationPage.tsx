@@ -1,10 +1,4 @@
-import {
-    Box,
-    Button,
-    CircularProgress,
-    Alert,
-    Snackbar,
-} from '@mui/material';
+import { Box, Button, CircularProgress, Alert, Snackbar } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { trpc } from '../utils/trpc';
@@ -97,16 +91,12 @@ export default function TaskCreationPage() {
                 )}
                 <form onSubmit={handleSubmit}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <TaskForm
-                            task={mainTask}
-                            skills={skills}
-                            maxDepth={3}
-                        />
+                        <TaskForm task={mainTask} skills={skills} maxDepth={3} />
 
                         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                            <Button 
-                                type="submit" 
-                                variant="contained" 
+                            <Button
+                                type="submit"
+                                variant="contained"
                                 color="primary"
                                 disabled={createTaskMutation.isPending}
                             >

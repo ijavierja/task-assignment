@@ -1,11 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
-import { prisma } from '../lib/prisma';
-import { BadRequestError, InternalServerError } from '../utils/errors';
+import { prisma } from "../lib/prisma";
+import { InternalServerError } from "../utils/errors";
 
-const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-const ai = new GoogleGenAI({})
+const ai = new GoogleGenAI({});
 
 /**
  * Identify required skills for a task based on its title using LLM
@@ -15,7 +15,7 @@ const ai = new GoogleGenAI({})
 export const identifySkillsFromTask = async (taskTitle: string): Promise<string[]> => {
     // Get all available skills from the database
     const availableSkills = await prisma.skill.findMany();
-    const skillNames = availableSkills.map(s => s.name);
+    const skillNames = availableSkills.map((s) => s.name);
 
     if (skillNames.length === 0) {
         return [];
@@ -23,7 +23,7 @@ export const identifySkillsFromTask = async (taskTitle: string): Promise<string[
 
     const prompt = `You are a task skill analyzer. Given a task title/description, identify which skills from the provided list are required to complete this task.
 
-Available skills: ${skillNames.join(', ')}
+Available skills: ${skillNames.join(", ")}
 
 Task: "${taskTitle}"
 
@@ -34,7 +34,7 @@ Do not include any other text, just the JSON array.`;
 
     const result = await ai.models.generateContent({
         model: modelName,
-        contents: prompt
+        contents: prompt,
     });
     const responseText = result.text;
 
@@ -43,28 +43,27 @@ Do not include any other text, just the JSON array.`;
     try {
         // First try direct parsing
         identifiedSkills = responseText ? JSON.parse(responseText) : [];
-    } catch (parseError) {
+    } catch {
         // If that fails, try to extract JSON array from the text
         const jsonMatch = responseText?.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
             identifiedSkills = JSON.parse(jsonMatch[0]);
         } else {
-            throw new InternalServerError('LLM returned invalid format');
+            throw new InternalServerError("LLM returned invalid format");
         }
     }
 
     // Validate that the skills exist in our database
     const validSkills = identifiedSkills.filter((skill: string) =>
-        skillNames.some(s => s.toLowerCase() === skill.toLowerCase())
+        skillNames.some((s) => s.toLowerCase() === skill.toLowerCase())
     );
 
     // Return with proper casing from database
-    const result_skills = validSkills.map((skill: string) =>
-        skillNames.find(s => s.toLowerCase() === skill.toLowerCase()) || skill
+    const result_skills = validSkills.map(
+        (skill: string) => skillNames.find((s) => s.toLowerCase() === skill.toLowerCase()) || skill
     );
 
     return result_skills;
-
 };
 
 /**
@@ -83,5 +82,5 @@ export const getSkillIdsByNames = async (skillNames: string[]): Promise<string[]
         },
     });
 
-    return skills.map(s => s.id);
+    return skills.map((s) => s.id);
 };
