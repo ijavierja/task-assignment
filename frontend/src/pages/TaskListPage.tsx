@@ -264,6 +264,13 @@ export default function TaskListPage() {
                 newMap.set(newSubtask.id, newTaskWithSubtasks);
                 return newMap;
             });
+
+            // Expand the parent task so user can see the new subtask
+            setExpandedRows((prevExpanded) => {
+                const newExpanded = new Set(prevExpanded);
+                newExpanded.add(subtaskDialog.parentTaskId);
+                return newExpanded;
+            });
         }
 
         // Refresh to get any data we might have missed

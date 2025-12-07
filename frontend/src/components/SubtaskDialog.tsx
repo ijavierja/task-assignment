@@ -13,6 +13,7 @@ import {
     Box,
     Button,
     Alert,
+    FormHelperText,
 } from '@mui/material';
 import { useState } from 'react';
 import { trpc } from '../utils/trpc';
@@ -57,10 +58,6 @@ export default function SubtaskDialog({
     const handleSubmit = () => {
         if (!title.trim()) {
             setError('Please enter a subtask title');
-            return;
-        }
-        if (selectedSkills.length === 0) {
-            setError('Please select at least one skill');
             return;
         }
         setError(null);
@@ -127,6 +124,9 @@ export default function SubtaskDialog({
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>
+                            Optional: Leave empty and skills will be automatically identified by AI
+                        </FormHelperText>
                     </FormControl>
                 </Box>
             </DialogContent>
