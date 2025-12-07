@@ -28,17 +28,21 @@ model Skill {
 }
 
 model Task {
-  id         String     @id @default(cuid())
-  title      String
-  status     TaskStatus @default(TODO)
-  assigneeId String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  assignee   Developer? @relation(fields: [assigneeId], references: [id])
-  skills     Skill[]    @relation("task_skills")
+  id           String     @id @default(cuid())
+  title        String
+  status       TaskStatus @default(TODO)
+  assigneeId   String?
+  parentTaskId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assignee     Developer? @relation(fields: [assigneeId], references: [id])
+  skills       Skill[]    @relation("task_skills")
+  parentTask   Task?      @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+  subtasks     Task[]     @relation("TaskHierarchy")
 
   @@index([assigneeId])
   @@index([createdAt])
+  @@index([parentTaskId])
   @@map("tasks")
 }
 

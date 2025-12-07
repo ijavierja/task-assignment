@@ -88,6 +88,12 @@ export const appRouter = router({
             .query(async ({ input }) => {
                 return await taskService.getAvailableAssignees(input.id);
             }),
+
+        getSubtasks: publicProcedure
+            .input(z.object({ id: z.string() }))
+            .query(async ({ input }) => {
+                return await taskService.getSubtasks(input.id);
+            }),
     }),
 
     // Developers procedures

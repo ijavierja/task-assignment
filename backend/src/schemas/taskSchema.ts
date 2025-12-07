@@ -4,6 +4,7 @@ import { TaskStatus } from "../../generated/prisma";
 export const createTaskSchema = z.object({
     title: z.string().min(1, "Title is required"),
     skillIds: z.array(z.string()).optional().default([]),
+    parentTaskId: z.string().optional(),
 });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;

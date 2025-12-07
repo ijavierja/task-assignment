@@ -24,6 +24,7 @@ export interface Task {
     description?: string;
     status: TaskStatus;
     assigneeId?: string | null;
+    parentTaskId?: string | null;
     assignee?: Developer | null;
     skills: Skill[];
     createdAt: string;
@@ -51,6 +52,7 @@ export const mapTaskFromAPI = (task: any): Task => {
         description: task.description,
         status: task.status as TaskStatus,
         assigneeId: task.assigneeId,
+        parentTaskId: task.parentTaskId,
         assignee: task.assignee,
         skills: task.skills ?? [],
         createdAt: task.createdAt,
