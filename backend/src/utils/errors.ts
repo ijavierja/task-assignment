@@ -38,3 +38,9 @@ export class ConflictError extends HttpError {
         super(message, StatusCodes.CONFLICT);
     }
 }
+
+export class InternalServerError extends HttpError {
+    constructor(message = "Internal Server Error") {
+        super(message, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}

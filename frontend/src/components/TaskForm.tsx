@@ -12,6 +12,7 @@ import {
     CardContent,
     IconButton,
     Collapse,
+    FormHelperText,
 } from '@mui/material';
 import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -125,6 +126,9 @@ export default function TaskForm({
                                     </MenuItem>
                                 ))}
                             </Select>
+                            <FormHelperText>
+                                Optional: Leave empty and skills will be automatically identified by AI
+                            </FormHelperText>
                         </FormControl>
                     </Box>
 

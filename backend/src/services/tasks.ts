@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma";
 import { Task, TaskStatus, Developer, Skill } from "../../generated/prisma";
 import { createTaskSchema } from "../schemas/taskSchema";
 import { BadRequestError, NotFoundError } from "../utils/errors";
+import { identifySkillsFromTask, getSkillIdsByNames } from "./llm";
 import z from "zod";
 
 const MAX_SUBTASK_DEPTH = 3;
@@ -110,11 +111,20 @@ export const createTask = async (
         }
     }
 
-    if (newTask.skillIds.length > 0) {
+    // If no skills provided, use LLM to identify them from the task title
+    let skillIds = newTask.skillIds;
+    if (skillIds.length === 0) {
+        const identifiedSkillNames = await identifySkillsFromTask(newTask.title);
+        
+        if (identifiedSkillNames.length > 0) {
+            skillIds = await getSkillIdsByNames(identifiedSkillNames);
+        }
+    } else {
+        // Validate provided skills
         const skills = await prisma.skill.findMany({
-            where: { id: { in: newTask.skillIds } },
+            where: { id: { in: skillIds } },
         });
-        if (skills.length !== newTask.skillIds.length) {
+        if (skills.length !== skillIds.length) {
             throw new BadRequestError("One or more skills not found");
         }
     }
@@ -124,7 +134,7 @@ export const createTask = async (
             title: newTask.title,
             parentTaskId: newTask.parentTaskId,
             skills: {
-                connect: newTask.skillIds.map((id) => ({ id })),
+                connect: skillIds.map((id) => ({ id })),
             },
         },
         include: {

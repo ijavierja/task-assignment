@@ -22,18 +22,7 @@ export default function TaskCreationPage() {
     const initializeTask = useTaskCreationStore((state) => state.initializeTask);
 
     const { data: skills = [], isLoading: skillsLoading } = trpc.skills.getAll.useQuery();
-    const createTaskMutation = trpc.tasks.create.useMutation({
-        onSuccess: () => {
-            showNotification('Task created successfully!', 'success');
-            setTimeout(() => {
-                navigate('/');
-            }, 1000);
-        },
-        onError: (err) => {
-            setError(err.message);
-            showNotification('Failed to create task', 'error');
-        },
-    });
+    const createTaskMutation = trpc.tasks.create.useMutation();
 
     // Initialize task on mount
     useEffect(() => {
@@ -75,8 +64,14 @@ export default function TaskCreationPage() {
         try {
             // Create main task and all subtasks recursively
             await createTasksRecursively(mainTask);
+            showNotification('Task created successfully!', 'success');
+            setTimeout(() => {
+                navigate('/');
+            }, 1000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create task');
+            const errorMsg = err instanceof Error ? err.message : 'Failed to create task';
+            setError(errorMsg);
+            showNotification(errorMsg, 'error');
         }
     };
 
