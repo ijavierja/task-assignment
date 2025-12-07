@@ -70,10 +70,6 @@ export default function TaskCreationPage() {
             setError('Please enter a task title');
             return;
         }
-        if (mainTask.skillIds.length === 0) {
-            setError('Please select at least one skill');
-            return;
-        }
         setError(null);
 
         try {
